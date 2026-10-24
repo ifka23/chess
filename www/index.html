@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>شطرنج</title>
+<style>
+:root{--bg:#e8eef0;--tx:#17262d;--bt:#fff;--lt:#cfdbe0;--dk:#5d7d8c;--hl:#e3bd4b;--bd:min(94vw,480px);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121b20;--tx:#e6eef1;--bt:#1e2b32}}
+:root[data-theme="dark"]{--bg:#121b20;--tx:#e6eef1;--bt:#1e2b32}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--tx);font-family:"Segoe UI",Tahoma,Arial,sans-serif;display:flex;flex-direction:column;align-items:center;gap:14px;padding:18px 0 28px;min-height:100vh}
+h1{margin:0;font-size:26px;font-weight:700}
+#st{font-size:18px;min-height:28px;font-weight:600}
+#bd{width:var(--bd);height:var(--bd);display:grid;grid-template-columns:repeat(8,1fr);direction:ltr;border-radius:6px;overflow:hidden;box-shadow:0 6px 24px rgba(0,0,0,.28)}
+.sq{border:0;padding:0;margin:0;position:relative;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:calc(var(--bd)/8*.8);line-height:1}
+.l{background:var(--lt)}.d{background:var(--dk)}
+.m::before{content:"";position:absolute;inset:0;background:var(--hl);opacity:.45}
+.s::before{content:"";position:absolute;inset:0;background:var(--hl);opacity:.8}
+.k{box-shadow:inset 0 0 0 4px #d6453d}
+.t::after{content:"";position:absolute;width:30%;height:30%;border-radius:50%;background:rgba(20,30,35,.35)}
+.x{box-shadow:inset 0 0 0 4px rgba(20,30,35,.4)}
+.sq:focus-visible{outline:3px solid #1a73e8;outline-offset:-3px;z-index:2}
+.sq i{font-style:normal;position:relative;z-index:1}
+i.w{color:#fff;text-shadow:0 0 2px #000,0 0 2px #000,0 1px 1px #000}
+i.b{color:#10181c;text-shadow:0 0 1px #9fb4bd,0 0 1px #9fb4bd}
+#ct{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+button.c{font:inherit;font-size:15px;padding:9px 16px;border-radius:8px;border:1.5px solid var(--dk);background:var(--bt);color:var(--tx);cursor:pointer}
+button.c:hover{background:var(--dk);color:#fff}
+button.c:focus-visible{outline:3px solid #1a73e8;outline-offset:2px}
+#rm{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;align-items:center}
+#cd{font:inherit;font-size:16px;width:90px;padding:9px;text-align:center;border-radius:8px;border:1.5px solid var(--dk);background:var(--bt);color:var(--tx);direction:ltr}
+#nt{margin:0;min-height:24px;font-size:15px;text-align:center;padding:0 12px}
+</style></head><body>
+<h1>شطرنج</h1>
+<div id="st"></div>
+<div id="bd"></div>
+<div id="ct">
+<button class="c" id="nw">لعبة جديدة</button>
+<button class="c" id="un">تراجع</button>
+<button class="c" id="md">الوضع: ضد الحاسوب</button>
+<button class="c" id="sd">بدّل اللون</button>
+</div>
+<div id="rm"><button class="c" id="hs">إنشاء غرفة</button><input id="cd" inputmode="numeric" maxlength="4" placeholder="الرمز" aria-label="رمز الغرفة"><button class="c" id="jn">انضمام</button></div>
+<div id="rm"><button class="c" id="lh">فتح نقطة لعب (بدون إنترنت)</button><input id="ip" inputmode="decimal" placeholder="عنوان IP" aria-label="عنوان IP" style="width:140px;font:inherit;font-size:16px;padding:9px;text-align:center;border-radius:8px;border:1.5px solid var(--dk);background:var(--bt);color:var(--tx);direction:ltr"><button class="c" id="lj">اتصال</button></div>
+<p id="nt"></p>
+<script>
+const V={p:100,n:320,b:330,r:500,q:900,k:0},GL={k:'♚︎',q:'♛︎',r:'♜︎',b:'♝︎',n:'♞︎',p:'♟︎'};
+const N=[[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]],K=[[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]],D=[[-1,-1],[-1,1],[1,-1],[1,1]],O=[[-1,0],[1,0],[0,-1],[0,1]];
+const isW=p=>p<'a',$=id=>document.getElementById(id);
+const init=()=>({b:'rnbqkbnrpppppppp'.split('').concat(Array(32).fill(''),'PPPPPPPP'.split(''),'RNBQKBNR'.split('')),w:true,c:{K:1,Q:1,k:1,q:1},ep:-1});
+function att(b,s,byW){const r=s>>3,c=s&7,P=byW?'P':'p',pr=byW?r+1:r-1;
+ for(const dc of[-1,1])if(pr>=0&&pr<8&&c+dc>=0&&c+dc<8&&b[pr*8+c+dc]===P)return 1;
+ const at=(dr,dc,ch)=>{const rr=r+dr,cc=c+dc;return rr>=0&&rr<8&&cc>=0&&cc<8&&b[rr*8+cc]===(byW?ch.toUpperCase():ch)};
+ for(const[d,e]of N)if(at(d,e,'n'))return 1;
+ for(const[d,e]of K)if(at(d,e,'k'))return 1;
+ for(const[dirs,t]of[[D,'b'],[O,'r']])for(const[d,e]of dirs){let rr=r+d,cc=c+e;while(rr>=0&&rr<8&&cc>=0&&cc<8){const p=b[rr*8+cc];if(p){const l=p.toLowerCase();if(isW(p)===byW&&(l===t||l==='q'))return 1;break}rr+=d;cc+=e}}
+ return 0}
+function gen(s){const{b,w,c,ep}=s,m=[];
+ for(let f=0;f<64;f++){const p=b[f];if(!p||isW(p)!==w)continue;const r=f>>3,col=f&7,l=p.toLowerCase();
+  const add=(rr,cc)=>{if(rr<0||rr>7||cc<0||cc>7)return 0;const t=rr*8+cc,q=b[t];if(q&&isW(q)===w)return 0;m.push({f,t});return !q};
+  if(l==='p'){const d=w?-1:1,st=w?6:1;
+   if(!b[(r+d)*8+col]){m.push({f,t:(r+d)*8+col});if(r===st&&!b[(r+2*d)*8+col])m.push({f,t:(r+2*d)*8+col})}
+   for(const dc of[-1,1]){const cc=col+dc;if(cc<0||cc>7)continue;const t=(r+d)*8+cc;if((b[t]&&isW(b[t])!==w)||t===ep)m.push({f,t})}}
+  else if(l==='n')for(const[d,e]of N)add(r+d,col+e);
+  else if(l==='k'){for(const[d,e]of K)add(r+d,col+e);const h=w?56:0;
+   if(f===h+4){const R=w?'R':'r';
+    if(c[w?'K':'k']&&!b[h+5]&&!b[h+6]&&b[h+7]===R&&!att(b,h+4,!w)&&!att(b,h+5,!w)&&!att(b,h+6,!w))m.push({f,t:h+6});
+    if(c[w?'Q':'q']&&!b[h+3]&&!b[h+2]&&!b[h+1]&&b[h]===R&&!att(b,h+4,!w)&&!att(b,h+3,!w)&&!att(b,h+2,!w))m.push({f,t:h+2})}}
+  else{const dirs=l==='b'?D:l==='r'?O:D.concat(O);for(const[d,e]of dirs){let rr=r+d,cc=col+e;while(add(rr,cc)){rr+=d;cc+=e}}}}
+ return m}
+function app(s,m){const b=s.b.slice(),{f,t}=m,p=b[f],l=p.toLowerCase(),w=s.w,c={...s.c};let ep=-1;
+ if(l==='p'&&t===s.ep&&!b[t])b[t+(w?8:-8)]='';
+ if(l==='p'&&Math.abs(t-f)===16)ep=(f+t)>>1;
+ if(l==='k'&&Math.abs(t-f)===2){const h=w?56:0;if(t>f){b[h+5]=b[h+7];b[h+7]=''}else{b[h+3]=b[h];b[h]=''}}
+ b[t]=p;b[f]='';
+ if(l==='p'&&(t>>3===0||t>>3===7))b[t]=w?'Q':'q';
+ if(l==='k'){if(w){c.K=c.Q=0}else{c.k=c.q=0}}
+ for(const x of[f,t]){if(x===0)c.q=0;if(x===7)c.k=0;if(x===56)c.Q=0;if(x===63)c.K=0}
+ return{b,w:!w,c,ep}}
+const kp=(b,w)=>b.indexOf(w?'K':'k'),inChk=s=>att(s.b,kp(s.b,s.w),!s.w);
+const leg=s=>gen(s).filter(m=>{const n=app(s,m);return !att(n.b,kp(n.b,s.w),!s.w)});
+function ev(s){let v=0;for(let i=0;i<64;i++){const p=s.b[i];if(!p)continue;const l=p.toLowerCase(),r=i>>3,c=i&7;
+ const x=V[l]+(l==='k'?0:(7-Math.abs(7-2*c-0)+0)*0+(3.5-Math.abs(3.5-c)+3.5-Math.abs(3.5-r))*(l==='p'?6:4));v+=isW(p)?x:-x}return v}
+function srch(s,d,a,B){const ms=leg(s);if(!ms.length)return inChk(s)?(s.w?-1e5-d:1e5+d):0;if(!d)return ev(s);
+ ms.sort((x,y)=>!!s.b[y.t]-!!s.b[x.t]);
+ if(s.w){let v=-1e9;for(const m of ms){v=Math.max(v,srch(app(s,m),d-1,a,B));a=Math.max(a,v);if(a>=B)break}return v}
+ let v=1e9;for(const m of ms){v=Math.min(v,srch(app(s,m),d-1,a,B));B=Math.min(B,v);if(a>=B)break}return v}
+let S=init(),hist=[],sel=-1,tg=[],last=null,mode='ai',me=true,flip=false,busy=false;
+function render(){const bd=$('bd');bd.innerHTML='';const ms=leg(S),chk=inChk(S);
+ for(let i=0;i<64;i++){const k=flip?63-i:i,r=k>>3,c=k&7,p=S.b[k],d=document.createElement('button');
+  d.className='sq '+((r+c)%2?'d':'l')+(k===sel?' s':'')+(last&&(k===last.f||k===last.t)?' m':'')+(chk&&p===(S.w?'K':'k')?' k':'')+(tg.includes(k)?(p?' x':' t'):'');
+  if(p)d.innerHTML='<i class="'+(isW(p)?'w':'b')+'">'+GL[p.toLowerCase()]+'</i>';
+  d.setAttribute('aria-label','abcdefgh'[c]+(8-r)+(p?' '+(isW(p)?'W':'B')+p.toUpperCase():''));
+  d.onclick=()=>click(k);bd.append(d)}
+ $('st').textContent=!ms.length?(chk?'كش مات! فاز '+(S.w?'الأسود':'الأبيض'):'تعادل بالطريق المسدود'):(S.w?'دور الأبيض':'دور الأسود')+(chk?' — كش!':'')}
+function click(k){if(busy||(mode!=='2p'&&S.w!==me)||((mode==='net'||mode==='lan')&&!netOk))return;const p=S.b[k];
+ if(sel>=0&&tg.includes(k)){const m={f:sel,t:k};if(mode==='net')netSend(m);else if(mode==='lan')lanSend({f:m.f,t:m.t});hist.push(S);last=m;S=app(S,m);sel=-1;tg=[];render();aiTurn();return}
+ if(p&&isW(p)===S.w){sel=k;tg=leg(S).filter(m=>m.f===k).map(m=>m.t)}else{sel=-1;tg=[]}
+ render()}
+function aiTurn(){if(mode!=='ai'||S.w===me)return;const ms=leg(S);if(!ms.length)return;busy=true;
+ setTimeout(()=>{let best=null,bv=0;for(const m of ms){let v=srch(app(S,m),2,-1e9,1e9)+Math.random()*4;if(!S.w)v=-v;if(best===null||v>bv){best=m;bv=v}}
+  hist.push(S);last=best;S=app(S,best);busy=false;render()},50)}
+function reset(){S=init();hist=[];sel=-1;tg=[];last=null;busy=false;render();aiTurn()}
+$('nw').onclick=()=>{if(mode==='lan'){if(netOk)lanSend({r:1});reset();return}if(mode==='net'){if(netOk)FB.updateDoc(ref,{m:[],g:FB.increment(1)});return}reset()};
+$('un').onclick=()=>{if(mode==='net'||mode==='lan'||busy||!hist.length)return;S=hist.pop();if(mode==='ai'&&S.w!==me&&hist.length)S=hist.pop();sel=-1;tg=[];last=null;render()};
+$('md').onclick=()=>{leaveNet();mode=mode==='ai'?'2p':'ai';flip=mode==='ai'&&!me;$('md').textContent='الوضع: '+(mode==='ai'?'ضد الحاسوب':'لاعبان');reset()};
+$('sd').onclick=()=>{if(mode==='net'||mode==='lan')return;me=!me;flip=mode==='ai'&&!me;reset()};
+let ref=null,unsub=null,netOk=false,gn=-1;
+function leaveNet(){lanStop();if(unsub)unsub();unsub=ref=null;netOk=false;gn=-1;$('nt').textContent=''}
+const nt=t=>$('nt').textContent=t;
+function netStart(m){leaveNet();if(!window.FB){nt('تعذّر تحميل Firebase. تأكد من الإنترنت وافتح الملف من جهازك.');return false}mode='net';me=m;flip=!m;$('md').textContent='الوضع: أونلاين';return true}
+function netSend(m){FB.updateDoc(ref,{m:FB.arrayUnion(hist.length*4096+m.f*64+m.t)}).catch(()=>nt('تعذّر إرسال الحركة'))}
+function watch(){unsub=FB.onSnapshot(ref,sn=>{const d=sn.data();if(!d)return;
+ if(d.g!==gn){gn=d.g;S=init();hist=[];last=null;sel=-1;tg=[]}
+ if(d.j&&!netOk){netOk=true;nt('متصل — أنت تلعب بـ'+(me?'الأبيض':'الأسود'))}
+ const mv=[...d.m].sort((x,y)=>x-y);
+ while(hist.length<mv.length){const x=mv[hist.length],f=(x>>6)&63,t=x&63,m=leg(S).find(y=>y.f===f&&y.t===t);if(!m)break;hist.push(S);last=m;S=app(S,m)}
+ render()},e=>nt('خطأ في الاتصال: '+e.code))}
+async function host(){if(!netStart(true))return;const code=String(Math.floor(1000+Math.random()*9000));ref=FB.doc(FB.db,'chessRooms',code);
+ try{const sn=await FB.getDoc(ref);if(sn.exists()&&Date.now()-sn.data().t<864e5)return host();
+  await FB.setDoc(ref,{m:[],g:0,j:false,t:Date.now()});nt('رمز الغرفة: '+code+' — أرسله للاعب الآخر وانتظره');reset();watch()}
+ catch(e){nt('تعذّر إنشاء الغرفة: '+(e.code||e.message))}}
+async function join(){const code=$('cd').value.trim();if(!/^\d{4}$/.test(code)){nt('اكتب رمز الغرفة المكوّن من 4 أرقام');return}
+ if(!netStart(false))return;nt('جارٍ الاتصال...');ref=FB.doc(FB.db,'chessRooms',code);
+ try{const sn=await FB.getDoc(ref);if(!sn.exists()){nt('لا توجد غرفة بهذا الرمز');return}
+  await FB.updateDoc(ref,{j:true});reset();watch()}
+ catch(e){nt('تعذّر الانضمام: '+(e.code||e.message))}}
+$('hs').onclick=host;$('jn').onclick=join;
+const PORT=8765,WS=()=>window.Capacitor&&Capacitor.isNativePlatform&&Capacitor.isNativePlatform()?Capacitor.Plugins.WebsocketServer:null;
+let lw=null,lws=null,lu=null;
+function lanSend(o){const t=JSON.stringify(o);if(lw&&lu)lw.send({uuid:lu,message:t});else if(lws&&lws.readyState===1)lws.send(t)}
+function lanRecv(t){let d;try{d=JSON.parse(t)}catch(e){return}
+ if(d.r){reset();return}
+ const m=leg(S).find(x=>x.f===d.f&&x.t===d.t);if(m){hist.push(S);last=m;S=app(S,m);sel=-1;tg=[];render()}}
+function lanStop(){try{if(lw){lw.removeAllListeners();lw.stop()}}catch(e){}try{if(lws)lws.close()}catch(e){}lw=lws=lu=null}
+async function lanHost(){const P=WS();if(!P){nt('فتح نقطة اللعب متاح داخل تطبيق أندرويد فقط');return}
+ leaveNet();mode='lan';me=true;flip=false;$('md').textContent='الوضع: شبكة محلية';lw=P;
+ await P.addListener('onOpen',e=>{lu=e.connection.uuid;netOk=true;nt('متصل — أنت تلعب بالأبيض');reset()});
+ await P.addListener('onMessage',e=>lanRecv(e.message));
+ await P.addListener('onClose',()=>{netOk=false;lu=null;nt('انقطع اتصال اللاعب الآخر')});
+ await P.addListener('onFailure',e=>nt('خطأ: '+e.reason));
+ try{await P.start({port:PORT,tcpNoDelay:true});const ifs=await P.getInterfaces(),ips=[];
+  for(const[n,v]of Object.entries(ifs))if(!/^(lo|rmnet|dummy|tun)/.test(n))for(const a of v.ipv4Addresses)if(!a.startsWith('127.'))ips.push(a);
+  nt('فعّل الهوتسبوت (أو اتصل بنفس الواي فاي) ثم أعطِ اللاعب الآخر هذا العنوان: '+(ips.join(' أو ')||'غير معروف')+' — بانتظاره...');reset()}
+ catch(e){nt('تعذّر فتح نقطة اللعب: '+(e.message||e))}}
+function lanJoin(){const ip=$('ip').value.trim();if(!/^\d{1,3}(\.\d{1,3}){3}$/.test(ip)){nt('اكتب عنوان IP مثل 192.168.43.1');return}
+ leaveNet();mode='lan';me=false;flip=true;$('md').textContent='الوضع: شبكة محلية';nt('جارٍ الاتصال...');
+ try{lws=new WebSocket('ws://'+ip+':'+PORT)}catch(e){nt('تعذّر الاتصال');return}
+ lws.onopen=()=>{netOk=true;nt('متصل — أنت تلعب بالأسود');reset()};
+ lws.onmessage=e=>lanRecv(e.data);
+ lws.onclose=()=>{if(mode==='lan'){netOk=false;nt('انقطع الاتصال')}};
+ lws.onerror=()=>nt('تعذّر الاتصال. تأكد أنكما على نفس الشبكة وأن اللاعب الآخر فتح النقطة')}
+$('lh').onclick=lanHost;$('lj').onclick=lanJoin;
+render();
+</script><script type="module">
+import{initializeApp}from"https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import*as F from"https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+const app=initializeApp({apiKey:"AIzaSyB2NcB6tOq1SgQrTfm7byN6f5tS0BF8eQ8",authDomain:"chess-5432e.firebaseapp.com",projectId:"chess-5432e",storageBucket:"chess-5432e.firebasestorage.app",messagingSenderId:"815718313663",appId:"1:815718313663:web:ef79913929bb77cefb600a"});
+window.FB={db:F.getFirestore(app),...F};
+</script>
+</body></html>

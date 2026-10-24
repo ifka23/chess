@@ -1,0 +1,1 @@
+{"name":"chess-app","version":"1.0.0","private":true,"scripts":{"sync":"cap sync android","open":"cap open android"},"dependencies":{"@capacitor/android":"^8.5.3","@capacitor/cli":"^8.5.3","@capacitor/core":"^8.5.3","capacitor-websocket-server":"^0.0.1"}}

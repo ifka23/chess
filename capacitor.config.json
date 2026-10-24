@@ -1,0 +1,7 @@
+{
+  "appId": "com.chessgame.app",
+  "appName": "شطرنج",
+  "webDir": "www",
+  "server": { "androidScheme": "http", "cleartext": true },
+  "android": { "allowMixedContent": true }
+}
